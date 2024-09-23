@@ -43,9 +43,3 @@ patches:
     kind: ConfigMap
     name: argocd-rbac-cm
     namespace: argocd
-
-# - path: argocd-secret.yaml
-#   target:
-#     kind: Secret
-#     name: argocd-secret
-#     namespace: argocd
