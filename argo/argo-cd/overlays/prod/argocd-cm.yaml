@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-cm
+  namespace: argocd
+
+data:
+  url: https://k8s-prod.internal/apps/argocd
+  oidc.config: |
+    name: Keycloak
+    issuer: https://sso.internal/realms/internal
+    clientID: argocd-sso-client-prod
+    clientSecret: $keycloak-argocd-secret:oidc.keycloak.clientSecret
+    requestedScopes: ["web-origins", "email", "offline_access", "profile", "roles", "openid"]
+  kustomize.buildOptions: --enable-helm
+  resource.exclusions: |
+    - apiGroups:
+      - "cilium.io"
+      kinds:
+      - "CiliumIdentity"

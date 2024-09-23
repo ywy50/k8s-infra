@@ -1,4 +1,4 @@
-# k8s infra applications - example
+# Argo Project Deployments
 
 ## Install kustomize if not done yet
 
@@ -11,27 +11,27 @@ The following script detects your OS and downloads the appropriate kustomize bin
 curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
 ```
 
-## How it works - Example with ArgoCD
+## How it works
 
 ### 1. Review Resource Files
 
-The `base/v2.11.3` directory holds the common resources, such as standard deployment.yaml or service.yaml resource configuration files.
+The `base` folder holds the common resources, such as standard deployment.yaml or service.yaml resource configuration files.
 
 ---
 
 **`argo-cd/base/kustomization.yaml`**
 
-The kustomization.yaml file is the most important file in the `base` directory and it describes what resources you use.
+The kustomization.yaml file is the most important file in the `base` folder and it describes what resources you use.
 
 **`argo-cd/base/namespace.yaml`**
 
-This is the base configuration for the namespace to be created for argocd and will be used by kustomizations in the overlays directory. It usually is not necessary to modify this file, so it does not get patched by the overlays.
+This is the base configuration for the namespace to be created for argocd and will be used by kustomizations in the overlays folder. It usually is not necessary to modify this file, so it does not get patched by the overlays.
 
 ---
 
 ### 2. Define Test Environemnt Patch Files
 
-The `overlays` directory houses environment-specific patches. It has 2 sub-directories (one for each environment):
+The `overlays` folder houses environment-specific patches. It has 3 sub-folders (one for each environment):
 
 - `test`
 - `prod`
@@ -92,17 +92,11 @@ cd argo-cd
 kubectl apply -k overlays/prod
 ```
 
-### Patch Config map to set the argocd-server path
+### Delete all resources
 
-Use the `argocd-cmd-params-cm.yaml` file to update argocd-server path:
+If you need to delete anything that will be applied by a certain kustomization, e.g. argo-cd on test cluster, run this
 
 ```bash
 cd argo-cd
-kubectl apply -k argocd-cmd-params-cm.yaml
-```
-
-Afterwards, redeploy the argocd-server deployment:
-
-```bash
-kubectl -n argocd rollout restart deployment/argocd-server
+kustomize build overlays/test | kubectl delete -f -
 ```
