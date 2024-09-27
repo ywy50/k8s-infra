@@ -1,0 +1,15 @@
+# Enforce topology constraints for jaeger operator
+- op: add
+  path: /spec/template/spec/nodeSelector
+  value:
+    node-role.kubernetes.io/worker: 'true'
+
+- op: add
+  path: /spec/template/spec/topologySpreadConstraints
+  value:
+    - labelSelector:
+        matchLabels:
+          name: jaeger-operator
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule

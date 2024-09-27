@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+resources:
+  - certificate.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
+  - customresourcedefinition.yaml
+  - deployment.yaml
+  - issuer.yaml
+  - mutatingwebhookconfiguration.yaml
+  - role.yaml
+  - rolebinding.yaml
+  - service.yaml
+  - serviceaccount.yaml
+  - validatingwebhookconfiguration.yaml
