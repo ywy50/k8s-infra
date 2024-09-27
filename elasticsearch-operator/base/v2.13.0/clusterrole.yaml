@@ -1,0 +1,442 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/version: 2.13.0
+    control-plane: elastic-operator
+  name: elastic-operator
+rules:
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
+  - apiGroups:
+      - coordination.k8s.io
+    resourceNames:
+      - elastic-operator-leader
+    resources:
+      - leases
+    verbs:
+      - get
+      - watch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - events
+      - persistentvolumeclaims
+      - secrets
+      - services
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - elasticsearch.k8s.elastic.co
+    resources:
+      - elasticsearches
+      - elasticsearches/status
+      - elasticsearches/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - autoscaling.k8s.elastic.co
+    resources:
+      - elasticsearchautoscalers
+      - elasticsearchautoscalers/status
+      - elasticsearchautoscalers/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - kibana.k8s.elastic.co
+    resources:
+      - kibanas
+      - kibanas/status
+      - kibanas/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - apm.k8s.elastic.co
+    resources:
+      - apmservers
+      - apmservers/status
+      - apmservers/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - enterprisesearch.k8s.elastic.co
+    resources:
+      - enterprisesearches
+      - enterprisesearches/status
+      - enterprisesearches/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - beat.k8s.elastic.co
+    resources:
+      - beats
+      - beats/status
+      - beats/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - agent.k8s.elastic.co
+    resources:
+      - agents
+      - agents/status
+      - agents/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - maps.k8s.elastic.co
+    resources:
+      - elasticmapsservers
+      - elasticmapsservers/status
+      - elasticmapsservers/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - stackconfigpolicy.k8s.elastic.co
+    resources:
+      - stackconfigpolicies
+      - stackconfigpolicies/status
+      - stackconfigpolicies/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - logstash.k8s.elastic.co
+    resources:
+      - logstashes
+      - logstashes/status
+      - logstashes/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/version: 2.13.0
+    control-plane: elastic-operator
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: elastic-operator-view
+rules:
+  - apiGroups:
+      - elasticsearch.k8s.elastic.co
+    resources:
+      - elasticsearches
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling.k8s.elastic.co
+    resources:
+      - elasticsearchautoscalers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apm.k8s.elastic.co
+    resources:
+      - apmservers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - kibana.k8s.elastic.co
+    resources:
+      - kibanas
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - enterprisesearch.k8s.elastic.co
+    resources:
+      - enterprisesearches
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - beat.k8s.elastic.co
+    resources:
+      - beats
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - agent.k8s.elastic.co
+    resources:
+      - agents
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - maps.k8s.elastic.co
+    resources:
+      - elasticmapsservers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - stackconfigpolicy.k8s.elastic.co
+    resources:
+      - stackconfigpolicies
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - logstash.k8s.elastic.co
+    resources:
+      - logstashes
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/version: 2.13.0
+    control-plane: elastic-operator
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  name: elastic-operator-edit
+rules:
+  - apiGroups:
+      - elasticsearch.k8s.elastic.co
+    resources:
+      - elasticsearches
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - autoscaling.k8s.elastic.co
+    resources:
+      - elasticsearchautoscalers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - apm.k8s.elastic.co
+    resources:
+      - apmservers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - kibana.k8s.elastic.co
+    resources:
+      - kibanas
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - enterprisesearch.k8s.elastic.co
+    resources:
+      - enterprisesearches
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - beat.k8s.elastic.co
+    resources:
+      - beats
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - agent.k8s.elastic.co
+    resources:
+      - agents
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - maps.k8s.elastic.co
+    resources:
+      - elasticmapsservers
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - stackconfigpolicy.k8s.elastic.co
+    resources:
+      - stackconfigpolicies
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+  - apiGroups:
+      - logstash.k8s.elastic.co
+    resources:
+      - logstashes
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
