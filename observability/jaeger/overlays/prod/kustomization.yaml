@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+
+resources:
+- ../../base/v1.57.0
+- secret-elasticsearch-jaeger-secret.yaml
+- ingress-jaeger-query.yaml
+
+patches:
+- path: jaeger-patch.yaml
+  target:
+    kind: Jaeger
+    name: jaeger
+    namespace: observability

@@ -1,0 +1,91 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  labels:
+    app: jaeger
+    app.kubernetes.io/instance: jaeger-app
+    app.kubernetes.io/name: jaeger
+    jaegertracing.io/operated-by: observability.jaeger-operator
+  name: jaeger
+  namespace: observability
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                  - 'true'
+  agent:
+    config: {}
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+    strategy: DaemonSet
+  allInOne:
+    config: {}
+    metricsStorage:
+      type: prometheus
+    options:
+      prometheus:
+        server-url: >-
+          http://prometheus-kube-prometheus-prometheus.observability:9090/apps/prometheus
+      query:
+        base-path: /apps/jaeger
+    resources:
+      limits:
+        cpu: '2'
+        memory: 16Gi
+      requests:
+        cpu: '1'
+        memory: 16Gi
+  resources: {}
+  sampling:
+    options:
+      default_strategy:
+        param: 1
+        type: probabilistic
+      service_strategies:
+        - param: 0.2
+          service: jaeger-all-in-one
+          type: probabilistic
+        - service: "my-service-name"
+          type: probabilistic
+          param: 0.05
+  storage:
+    type: elasticsearch
+    options:
+      es.server-urls: http://jaeger-elasticsearch-es-http.observability.svc:9200
+      es.tls.enabled: 'false'
+      es.create-index-templates: 'true'
+    secretName: elasticsearch-jaeger-secret
+    cassandraCreateSchema: {}
+    dependencies:
+      resources: {}
+      schedule: 55 23 * * *
+    esIndexCleaner:
+      numberOfDays: 1
+      resources: {}
+      schedule: 30 22,07 * * *
+    # esRollover:
+    #   resources: {}
+    #   schedule: 0 0 * * *
+    grpcPlugin: {}
+  volumeMounts:
+    - name: certificates
+      mountPath: /es/certificates
+      readOnly: true
+  volumes:
+    - name: certificates
+      secret:
+        secretName: jaeger-elasticsearch-es-http-certs-public
+  strategy: allinone
+  ui:
+    options: {}

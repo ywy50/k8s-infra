@@ -1,0 +1,321 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  labels:
+    app: jaeger
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/name: jaeger
+    jaegertracing.io/operated-by: observability.jaeger-operator
+  managedFields:
+    - apiVersion: jaegertracing.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:status:
+          .: {}
+          f:phase: {}
+          f:version: {}
+      manager: jaeger-operator
+      operation: Update
+    - apiVersion: jaegertracing.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:kubectl.kubernetes.io/last-applied-configuration: {}
+          f:labels:
+            .: {}
+            f:app: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/name: {}
+        f:spec:
+          .: {}
+          f:affinity:
+            .: {}
+            f:nodeAffinity:
+              .: {}
+              f:requiredDuringSchedulingIgnoredDuringExecution: {}
+          f:agent:
+            .: {}
+            f:resources:
+              f:limits:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+              f:requests:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+            f:strategy: {}
+          f:allInOne:
+            f:metricsStorage:
+              f:type: {}
+            f:options:
+              f:prometheus:
+                .: {}
+                f:server-url: {}
+              f:query:
+                .: {}
+                f:base-path: {}
+            f:resources:
+              f:limits:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+              f:requests:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+          f:collector:
+            .: {}
+            f:maxReplicas: {}
+            f:nodeSelector:
+              .: {}
+              f:node-role.kubernetes.io/worker: {}
+            f:resources:
+              .: {}
+              f:limits:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+              f:requests:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+          f:ingester:
+            .: {}
+            f:nodeSelector:
+              .: {}
+              f:node-role.kubernetes.io/worker: {}
+            f:resources:
+              f:limits:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+              f:requests:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+          f:ingress:
+            .: {}
+            f:enabled: {}
+          f:labels:
+            .: {}
+            f:app: {}
+            f:app.kubernetes.io/name: {}
+          f:query:
+            .: {}
+            f:nodeSelector:
+              .: {}
+              f:node-role.kubernetes.io/worker: {}
+            f:options:
+              f:query:
+                .: {}
+                f:base-path: {}
+            f:resources:
+              f:limits:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+              f:requests:
+                .: {}
+                f:cpu: {}
+                f:memory: {}
+          f:storage:
+            .: {}
+            f:elasticsearch:
+              .: {}
+              f:nodeSelector:
+                .: {}
+                f:node-role.kubernetes.io/worker: {}
+            f:options:
+              .: {}
+              f:memory: {}
+            f:type: {}
+      manager: OpenAPI-Generator
+      operation: Update
+    - apiVersion: jaegertracing.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            f:jaegertracing.io/operated-by: {}
+        f:spec:
+          f:ingress:
+            f:security: {}
+          f:storage:
+            f:dependencies:
+              f:schedule: {}
+            f:elasticsearch:
+              f:nodeCount: {}
+              f:redundancyPolicy: {}
+              f:resources:
+                .: {}
+                f:limits:
+                  .: {}
+                  f:memory: {}
+                f:requests:
+                  .: {}
+                  f:cpu: {}
+                  f:memory: {}
+            f:esIndexCleaner:
+              f:numberOfDays: {}
+              f:schedule: {}
+            f:esRollover:
+              f:schedule: {}
+          f:strategy: {}
+      manager: jaeger-operator
+      operation: Update
+    - apiVersion: jaegertracing.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          f:sampling:
+            f:options:
+              f:default_strategy:
+                .: {}
+                f:param: {}
+                f:type: {}
+              f:service_strategies: {}
+          f:storage:
+            f:options:
+              f:memory:
+                f:max-traces: {}
+      manager: agent
+      operation: Update
+  name: jaeger
+  namespace: observability
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                  - 'true'
+  agent:
+    config: {}
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+    strategy: DaemonSet
+  allInOne:
+    config: {}
+    metricsStorage:
+      type: prometheus
+    options:
+      prometheus:
+        server-url: >-
+          http://prometheus-kube-prometheus-prometheus.observability:9090/apps/prometheus
+      query:
+        base-path: /apps/jaeger
+    resources:
+      limits:
+        cpu: '2'
+        memory: 4Gi
+      requests:
+        cpu: '1'
+        memory: 4Gi
+  collector:
+    config: {}
+    kafkaSecretName: ''
+    maxReplicas: 5
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  ingester:
+    config: {}
+    kafkaSecretName: ''
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  ingress:
+    enabled: false
+    openshift: {}
+    options: {}
+    resources: {}
+    security: none
+  labels:
+    app: jaeger
+    app.kubernetes.io/name: jaeger
+  query:
+    metricsStorage: {}
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options:
+      query:
+        base-path: /apps/jaeger
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  resources: {}
+  sampling:
+    options:
+      default_strategy:
+        param: 1
+        type: probabilistic
+      service_strategies:
+        - param: 0.2
+          service: jaeger-all-in-one
+          type: probabilistic
+  storage:
+    cassandraCreateSchema: {}
+    dependencies:
+      resources: {}
+      schedule: 55 23 * * *
+    elasticsearch:
+      name: elasticsearch
+      nodeCount: 3
+      nodeSelector:
+        node-role.kubernetes.io/worker: 'true'
+      redundancyPolicy: SingleRedundancy
+      resources:
+        limits:
+          memory: 16Gi
+        requests:
+          cpu: '1'
+          memory: 16Gi
+      storage: {}
+    esIndexCleaner:
+      numberOfDays: 7
+      resources: {}
+      schedule: 55 23 * * *
+    esRollover:
+      resources: {}
+      schedule: 0 0 * * *
+    grpcPlugin: {}
+    options:
+      memory:
+        max-traces: 1000000
+    type: memory
+  strategy: allinone
+  ui:
+    options: {}
+status:
+  phase: Running
+  version: 1.51.0

@@ -1,0 +1,149 @@
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  labels:
+    app: jaeger
+    app.kubernetes.io/instance: jaeger
+    app.kubernetes.io/name: jaeger
+    jaegertracing.io/operated-by: observability.jaeger-operator
+  name: jaeger
+  namespace: observability
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-role.kubernetes.io/worker
+                operator: In
+                values:
+                  - 'true'
+  volumeMounts:
+    - name: certificates
+      mountpath: /es/certificates
+      readOnly: true
+  volumes:
+    - name: certificates
+      secret:
+      secretName: jaeger-elasticsearch-es-http-certs-public
+  agent:
+    config: {}
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 500Mi
+    strategy: DaemonSet
+  # allInOne:
+  #   config: {}
+  #   metricsStorage:
+  #     type: prometheus
+  #   options:
+  #     prometheus:
+  #       server-url: >-
+  #         http://prometheus-kube-prometheus-prometheus.observability:9090/apps/prometheus
+  #     query:
+  #       base-path: /apps/jaeger
+  #   resources:
+  #     limits:
+  #       cpu: '2'
+  #       memory: 4Gi
+  #     requests:
+  #       cpu: '1'
+  #       memory: 4Gi
+  collector:
+    config: {}
+    kafkaSecretName: ''
+    maxReplicas: 5
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  ingester:
+    config: {}
+    kafkaSecretName: ''
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options: {}
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  ingress:
+    enabled: false
+    openshift: {}
+    options: {}
+    resources: {}
+    security: none
+  labels:
+    app: jaeger
+    app.kubernetes.io/name: jaeger
+  query:
+    metricsStorage: {}
+    nodeSelector:
+      node-role.kubernetes.io/worker: 'true'
+    options:
+      query:
+        base-path: /apps/jaeger
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+  resources: {}
+  sampling:
+    options:
+      default_strategy:
+        param: 1
+        type: probabilistic
+      service_strategies:
+        - param: 0.2
+          service: jaeger-all-in-one
+          type: probabilistic
+  storage:
+    cassandraCreateSchema: {}
+    dependencies:
+      resources: {}
+      schedule: 55 23 * * *
+    elasticsearch:
+      name: elasticsearch
+      nodeCount: 3
+      nodeSelector:
+        node-role.kubernetes.io/worker: 'true'
+      redundancyPolicy: SingleRedundancy
+      resources:
+        limits:
+          memory: 16Gi
+        requests:
+          cpu: '1'
+          memory: 16Gi
+      storage: {}
+    esIndexCleaner:
+      numberOfDays: 7
+      resources: {}
+      schedule: 55 23 * * *
+    esRollover:
+      resources: {}
+      schedule: 0 0 * * *
+    grpcPlugin: {}
+    # options:
+    #   memory:
+    #     max-traces: 1000000
+    # type: memory
+  # strategy: allinone
+  ui:
+    options: {}

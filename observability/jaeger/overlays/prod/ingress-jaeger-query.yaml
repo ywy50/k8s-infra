@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/add-base-url: "true"
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  labels:
+    app: jaeger-query
+    app.kubernetes.io/instance: jaeger-app
+    app.kubernetes.io/name: jaeger
+  name: jaeger-query
+  namespace: observability
+
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: k8s-prod.internal
+    http:
+      paths:
+      - path: /apps/jaeger(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: jaeger-query
+            port:
+              number: 16686
+  tls:
+  - hosts:
+    - k8s-prod.internal
+    secretName: jaeger-tls
