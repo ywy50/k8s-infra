@@ -1,0 +1,12 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: jaeger-elasticsearch
+spec:
+  version: 8.14.3
+  volumeClaimDeletePolicy: DeleteOnScaledownOnly
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false

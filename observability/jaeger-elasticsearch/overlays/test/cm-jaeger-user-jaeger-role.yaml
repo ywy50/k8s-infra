@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-role-config
+  namespace: observability
+data:
+  jaeger-role.json: |
+    {
+      "cluster": ["all"],
+      "indices": [
+        {
+          "names": [ "jaeger*" ],
+          "privileges": [ "read", "write", "create_index", "manage" ]
+        },
+        {
+          "names": [ "*" ],
+          "privileges": [ "all" ]
+        }
+      ]
+    }

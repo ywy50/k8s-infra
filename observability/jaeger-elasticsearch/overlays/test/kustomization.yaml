@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+
+resources:
+- ../../base/v8.14.3
+- jaeger-elasticsearch-apply-jaeger-user.yaml
+- secret-jaeger-elasticsearch-jaeger-user.yaml
+- cm-jaeger-user-jaeger-role.yaml
+- cm-jaeger-user-jaeger-role-mapping.yaml
+
+patches:
+- path: jaeger-elasticsearch-patch.yaml
+  target:
+    kind: Elasticsearch
+    name: jaeger-elasticsearch
+    namespace: observability

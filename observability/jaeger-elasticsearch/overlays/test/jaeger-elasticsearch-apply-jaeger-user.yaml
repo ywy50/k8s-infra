@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jaeger-elasticsearch-apply-jaeger-role
+  namespace: observability
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+spec:
+  template:
+    spec:
+      containers:
+#create jaeger user
+      - name: create-user
+        image: curlimages/curl:7.73.0
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            curl -X PUT -u "elastic:$ELASTIC_PASSWORD" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "password" : "'"$JAEGER_USER_PASSWORD"'",
+              "roles" : [ "jaeger_role" ],
+              "full_name" : "Jaeger User",
+              "email" : "jaeger@company.mydomain"
+            }' \
+            http://jaeger-elasticsearch-es-http:9200/_security/user/jaeger_user
+        env:
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jaeger-elasticsearch-es-elastic-user
+              key: elastic
+        - name: JAEGER_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jaeger-user-secret
+              key: jaeger_user
+##create role for jaeger user
+      - name: curl-jaeger-role
+        image: curlimages/curl:7.73.0
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Applying jaeger role..."
+            curl -u "elastic:$ELASTIC_PASSWORD" -X PUT "http://jaeger-elasticsearch-es-http:9200/_security/role/jaeger_role" \
+            -H 'Content-Type: application/json' \
+            -d @/jaeger-role/jaeger-role.json
+        env:
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jaeger-elasticsearch-es-elastic-user
+              key: elastic
+        volumeMounts:
+        - name: jaeger-role
+          mountPath: /jaeger-role
+# Apply jaeger role mapping
+      - name: curl-jaeger-role-mapping
+        image: curlimages/curl:7.73.0
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Applying jaeger role mapping..."
+            curl -u "elastic:$ELASTIC_PASSWORD" -X PUT "http://jaeger-elasticsearch-es-http:9200/_security/role_mapping/jaeger_role_mapping" \
+            -H 'Content-Type: application/json' \
+            -d @/jaeger-role-mapping/jaeger-role-mapping.json
+        env:
+        - name: ELASTIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: jaeger-elasticsearch-es-elastic-user
+              key: elastic
+        volumeMounts:
+        - name: jaeger-role-mapping
+          mountPath: /jaeger-role-mapping
+###Pod wide define available volumes
+      restartPolicy: OnFailure
+      volumes:
+      - name: jaeger-role
+        configMap:
+          name: jaeger-role-config
+      - name: jaeger-role-mapping
+        configMap:
+          name: jaeger-role-mapping-config
