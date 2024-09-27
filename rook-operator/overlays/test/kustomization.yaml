@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: rook-ceph
+
+resources:
+- ../../base/v1.14.9
+
+patches:
+# patch node affinity for deployments
+- path: node-affinity-patch.yaml
+  target:
+    kind: Deployment
+    namespace: rook-ceph
+    
+# patch config map for rook-operator
+- path: configmap-operator-patch.yaml
+  target:
+    kind: ConfigMap
+    name: rook-ceph-operator-config
+    namespace: rook-ceph
+
+# patch deployment for rook-operator
+- path: deployment-operator-patch.yaml
+  target:
+    kind: Deployment
+    name: rook-ceph-operator
+    namespace: rook-ceph
