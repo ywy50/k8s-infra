@@ -1,0 +1,9 @@
+- op: replace #action
+  path: "/spec/template/spec/affinity/nodeAffinity/requiredDuringSchedulingIgnoredDuringExecution" #resouirce we want to change
+  value:       #value we want to use for patching
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: In
+            values:
+              - 'true'

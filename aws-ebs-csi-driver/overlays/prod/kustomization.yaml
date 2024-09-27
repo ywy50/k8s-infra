@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-system
+
+resources:
+- ../../base/v1.33
+- secret-aws-ebs-csi-driver.yaml
+- storageclass-gp2.yaml
+# - configmap-aws-ec2-metadata-access.yaml
+
+
+patches:
+# patch main csi driver daemonset
+- path: daemonset-node-patch.yaml
+  target:
+    kind: DaemonSet
+    namespace: kube-system
+
+# patch main controller deployment
+- path: deployment-controller-patch.yaml
+  target:
+    kind: Deployment
+    namespace: kube-system
+    # name: ebs-csi-driver-controller
+
+# patch node affinity for deployments
+- path: node-affinity-patch.yaml
+  target:
+    kind: Deployment
+    namespace: kube-system
